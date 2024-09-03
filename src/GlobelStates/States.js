@@ -1,4 +1,6 @@
 import React, { createContext, useState, useContext } from 'react';
+import { useColorScheme } from 'react-native';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 // Define the colors that are available for theming
 const colorOptions = {
@@ -20,10 +22,21 @@ export const GlobalProvider = ({ children }) => {
   const [themeColor, setThemeColor] = useState(colorOptions.blue); // Default theme color
   const [userName, setUserName] = useState(''); // Example: User's name
   const [isLoggedIn, setIsLoggedIn] = useState(false); // Example: Authentication state
+  const isDarkMode = useColorScheme() === 'dark';
+  const imgBgColor = isDarkMode ? Colors.darker : '#E0E0E0';
+  const scondaryBgColor = isDarkMode ? '#070F2B' : '#e6f2ff';
+  const whiteBgColor = isDarkMode ? Colors.darker : 'white';
+  const textColor = isDarkMode ? 'white' : 'black';
+
 
   // Provide a central place to manage all states
   const value = {
     themeColor,
+    isDarkMode,
+    imgBgColor,
+    scondaryBgColor,
+    textColor,
+    whiteBgColor,
     setThemeColor,
     colorOptions, // Adding color options to the context
     userName,

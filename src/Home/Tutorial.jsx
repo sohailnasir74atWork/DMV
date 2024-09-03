@@ -1,153 +1,206 @@
-// TutorialComponent.js
-import React from 'react';
-import { SafeAreaView, Text, View, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { createStackNavigator, TransitionPresets } from '@react-navigation/stack';
+import React, { useRef, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+  Image,
+  Dimensions,
+  StatusBar,
+  useColorScheme,
+} from 'react-native';
+import { useGlobalState } from '../GlobelStates/States';
+import CustomText from '../Helper/MyText';
+import Ui19 from '../Assets/ui19.imageset/ui19.svg'; // Import SVG as a component
+import Ui11 from '../Assets/ui11.imageset/12291217_Parking lot security.svg'; // Import SVG as a component
+import Ui14 from '../Assets/ui14.imageset/ui14.svg'; // Import SVG as a component
+import Ui20 from '../Assets/ui20.imageset/ui21.svg'; // Import SVG as a component
+import CustomButton from '../Helper/MyTouchableOpacity';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-// Screens Data
-const screens = [
+const { width } = Dimensions.get('window');
+
+const data = [
   {
-    id: '1',
+    key: '1',
+    title: 'Gear Up',
+    description: 'From learner to driver, in one app.',
+    image: Ui19 // Use the imported SVG component
+  },
+  {
+    key: '2',
     title: 'Effective',
-    description: '96% of users pass the exam on the first try',
-    // image: require('./assets/tutorial1.png'), // Replace with your image path
+    description: '96% of user pass the exam on the first try.',
+    image: Ui11 // Use the imported SVG component
+
   },
   {
-    id: '2',
-    title: 'Convenient',
-    description: 'Learn at your own pace from anywhere',
-    // image: require('./assets/tutorial2.png'), // Replace with your image path
+    key: '3',
+    title: 'Real cases',
+    description: 'Database of questions from a real exam and DMV handbook',
+    image: Ui14 // Use the imported SVG component
+
   },
   {
-    id: '3',
-    title: 'Comprehensive',
-    description: 'All the materials you need to succeed',
-    // image: require('./assets/tutorial3.png'), // Replace with your image path
-  },
-  {
-    id: '4',
-    title: 'Certified',
-    description: 'Get certified with our trusted courses',
-    // image: require('./assets/tutorial4.png'), // Replace with your image path
+    key: '4',
+    title: 'Pass it Fast',
+    description: 'Shortcut to your driving license',
+    image: Ui20 // Use the imported SVG component
+
   },
 ];
 
-// Tutorial Screen Component
-const TutorialScreen = ({ navigation, route }) => {
-  const { screen } = route.params;
+const TutorialScreen = ({ navigation, setGuide }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const flatListRef = useRef(null);
+  const colorScheme = useColorScheme();
+  const { themeColor } = useGlobalState();
+
+  const handleScroll = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const index = Math.round(offsetX / width);
+    setCurrentIndex(index);
+  };
 
   const handleNext = () => {
-    const nextScreenIndex = screens.findIndex((s) => s.id === screen.id) + 1;
-    if (nextScreenIndex < screens.length) {
-      navigation.navigate('TutorialSlide', { screen: screens[nextScreenIndex] });
+    if (currentIndex < data.length - 1) {
+      flatListRef.current.scrollToIndex({ index: currentIndex + 1 });
     } else {
-      alert('Tutorial Finished');
+      setGuide(false);
     }
   };
 
   const handleSkip = () => {
-    alert('Skipped'); // Handle skip logic
+    const lastIndex = data.length - 1;
+    flatListRef.current.scrollToIndex({ index: lastIndex, animated: true });
+    setCurrentIndex(lastIndex);
   };
 
+  const renderItem = ({ item }) => (
+    <View style={styles.slide}>
+      {typeof item.image === 'function' ? (
+        <item.image style={styles.image} />
+      ) : (
+        <Image source={item.image} style={styles.image} />
+      )}
+      <CustomText style={styles.title}>{item.title}</CustomText>
+      <CustomText style={styles.text}>{item.description}</CustomText>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Skip button */}
-      <View style={styles.skipContainer}>
-        <TouchableOpacity onPress={handleSkip}>
-          <Text style={styles.skipText}>Skip</Text>
-        </TouchableOpacity>
+    <View style={[styles.container, {backgroundColor : colorScheme === 'dark' ? Colors.darker : Colors.lighter}]}>
+      <StatusBar
+        barStyle={colorScheme === 'dark' ? 'light-content' : 'dark-content'}
+        backgroundColor={colorScheme === 'dark' ? Colors.darker : Colors.lighter}
+      />
+      <CustomButton style={styles.skipButton} onPress={handleSkip}>
+        <Text style={styles.skipButtonText}>Skip</Text>
+      </CustomButton>
+      <FlatList
+        data={data}
+        renderItem={renderItem}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        keyExtractor={(item) => item.key}
+        onScroll={handleScroll}
+        ref={flatListRef}
+        scrollEventThrottle={16}
+      />
+      <View style={styles.footer}>
+        <View style={styles.pagination}>
+          {data.map((_, i) => (
+            <View
+              key={i}
+              style={[
+                styles.dot,
+                currentIndex === i && styles.activeDot,
+                currentIndex === i && styles.activeDot && { backgroundColor: themeColor }
+              ]}
+            />
+          ))}
+        </View>
+        <CustomButton style={styles.nextButton} onPress={handleNext}>
+          <Text style={styles.nextButtonText}>
+            {currentIndex === data.length - 1 ? 'Get Started' : 'Next'}
+          </Text>
+        </CustomButton>
       </View>
-
-      {/* Content */}
-      <View style={styles.slide}>
-        <Image source={screen.image} style={styles.image} />
-        <Text style={styles.title}>{screen.title}</Text>
-        <Text style={styles.description}>{screen.description}</Text>
-      </View>
-
-      {/* Next button */}
-      <View style={styles.bottomContainer}>
-        <TouchableOpacity style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>Next</Text>
-        </TouchableOpacity>
-      </View>
-    </SafeAreaView>
+    </View>
   );
 };
-
-// Stack Navigator for Tutorial
-const Stack = createStackNavigator();
-
-const TutorialNavigator = () => (
-  <Stack.Navigator
-    initialRouteName="TutorialSlide"
-    screenOptions={{ ...TransitionPresets.SlideFromRightIOS, headerShown: false }}
-  >
-    {screens.map((screen) => (
-      <Stack.Screen
-        key={screen.id}
-        name="TutorialSlide"
-        component={TutorialScreen}
-        initialParams={{ screen }}
-      />
-    ))}
-  </Stack.Navigator>
-);
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  skipContainer: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    zIndex: 1,
-  },
-  skipText: {
-    fontSize: 16,
-    color: '#007AFF',
   },
   slide: {
-    flex: 1,
-    justifyContent: 'center',
+    width: width,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   image: {
-    width: '70%',
-    height: '40%',
+    width: '100%',
+    height: '60%',
     resizeMode: 'contain',
-    marginVertical: 30,
+    backgroundColor:'transparent'
   },
   title: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
+    marginVertical: 20,
   },
-  description: {
-    fontSize: 16,
+  text: {
+    fontSize: 20,
     textAlign: 'center',
-    color: '#666',
-    marginBottom: 20,
+    paddingHorizontal: 20,
   },
-  bottomContainer: {
-    position: 'absolute',
-    bottom: 30,
-    left: 0,
-    right: 0,
+  skipButton: {
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    paddingTop: 40,
+    paddingRight: 20,
+  },
+  skipButtonText: {
+    fontSize: 20,
+  },
+  footer: {
+    flexDirection: 'column',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 30,
+  },
+  pagination: {
+    flexDirection: 'row',
+    paddingBottom: 40,
+  },
+  dot: {
+    width: 12,
+    height: 12,
+    borderRadius: 6,
+    marginHorizontal: 6,
+    backgroundColor: '#888',
+  },
+  activeDot: {
+    width: 25,
+    height: 12,
+    borderRadius: 6,
   },
   nextButton: {
-    backgroundColor: '#007AFF',
-    paddingVertical: 10,
+    backgroundColor: '#007bff',
+    paddingVertical: 12,
     paddingHorizontal: 20,
     borderRadius: 20,
+    width: '95%',
   },
   nextButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 20,
+    textAlign: 'center',
   },
 });
 
-export default TutorialNavigator;
+export default TutorialScreen;

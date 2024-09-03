@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import FirstScreen from './FirstScreen';
 
 export default function LearnScreen() {
   return (
     <View style={styles.container}>
-      <Text>Learn Screen</Text>
+      <FirstScreen/>
     </View>
   );
 }
@@ -12,7 +13,6 @@ export default function LearnScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+   
   },
 });

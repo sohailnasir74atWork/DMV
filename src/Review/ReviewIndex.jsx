@@ -1,10 +1,11 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import ReviewFirstScreen from './ReviewFisrtScreen';
 
 export default function ReviewScreen() {
   return (
     <View style={styles.container}>
-      <Text>Preview Screen</Text>
+      <ReviewFirstScreen/>
     </View>
   );
 }
@@ -12,7 +13,6 @@ export default function ReviewScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+   
   },
 });
