@@ -8,7 +8,7 @@ const CustomButton = ({ style, children, ...props }) => {
       style={[styles.button, style]} // Apply default button styles and any custom styles
       {...props}
     >
-      <Text style={styles.buttonText}>{children}</Text> 
+      <Text>{children}</Text> 
     </TouchableOpacity>
   );
 };
@@ -21,8 +21,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  buttonText: {
-  },
+
 });
 
 export default CustomButton;

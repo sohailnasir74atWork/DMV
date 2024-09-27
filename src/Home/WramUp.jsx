@@ -4,16 +4,18 @@ import Slider from '@react-native-community/slider';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { useGlobalState } from '../GlobelStates/States';
 import CustomText from '../Helper/MyText';
-import Ui1 from "../Assets/ui1.imageset/ui1.svg"; // Correctly import SVG
+import Ui1 from "../Assets/image/ui1.svg"; // Correctly import SVG
 import { useNavigation } from '@react-navigation/native';
-
 const { width } = Dimensions.get('window');
 
 const JourneyComponent = () => {
-  const [progress, setProgress] = useState(0.2);
-  const { themeColor, imgBgColor, scondaryBgColor } = useGlobalState();
+  const [progress, setProgress] = useState(0);
+  const { themeColor, imgBgColor, scondaryBgColor, setMode, activeTest } = useGlobalState();
   const navigation = useNavigation();
-  
+  const handlePress = () => {
+   
+      navigation.navigate('Warm Up')
+  };
   return (
     <View style={styles.container}>
       <CustomText style={{ fontWeight: 'bold' }}>Start your journey here</CustomText>
@@ -21,7 +23,7 @@ const JourneyComponent = () => {
       {/* Image Container with borderRadius */}
       <TouchableOpacity 
         style={styles.imageWrapper} 
-        onPress={() => navigation.navigate('Test')} // Correctly handle navigation
+        onPress={handlePress}       
       >
         <Ui1 style={[styles.image, {backgroundColor: imgBgColor}]} />
       </TouchableOpacity>
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
     marginBottom: 14,
   },
   gaugeTitle: {
-    fontSize: 24,
+    fontSize: 28,
     fontWeight: 'bold',
     marginVertical: 20,
   },

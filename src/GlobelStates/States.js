@@ -1,6 +1,8 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { data } from '../Helper/Data';
+import { testData } from '../Helper/Logic/TestData';
 
 // Define the colors that are available for theming
 const colorOptions = {
@@ -20,13 +22,34 @@ const GlobalContext = createContext();
 export const GlobalProvider = ({ children }) => {
   // Define all your global states here
   const [themeColor, setThemeColor] = useState(colorOptions.blue); // Default theme color
-  const [userName, setUserName] = useState(''); // Example: User's name
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // Example: Authentication state
+  const [hideBottomTab, setHideBottomTab] = useState(false); // Example: Authentication state
   const isDarkMode = useColorScheme() === 'dark';
-  const imgBgColor = isDarkMode ? Colors.darker : '#E0E0E0';
+  const imgBgColor = isDarkMode ? Colors.darker : '#EBEBEB';
   const scondaryBgColor = isDarkMode ? '#070F2B' : '#e6f2ff';
   const whiteBgColor = isDarkMode ? Colors.darker : 'white';
   const textColor = isDarkMode ? 'white' : 'black';
+  const [started, setStarted] = useState([]);
+  ////////////////////////////////////////////////
+  const [mode, setMode] = useState('easy'); // Default theme color
+console.log(started)
+  const [activeTest, setActiveTest] = useState({
+    id: 1,
+    description: testData[0].description,
+    img: testData[0].items[0].image,
+    level: testData[0].sectionTitle
+  })
+
+
+  //logics
+  const easy = data.filter(
+    (question) => question.difficulty === "Easy"
+  );
+  const medium = data.filter(
+    (question) => question.difficulty === "Medium"
+  );
+  const hard = data.filter(
+    (question) => question.difficulty === "Hard"
+  );
 
 
   // Provide a central place to manage all states
@@ -38,12 +61,15 @@ export const GlobalProvider = ({ children }) => {
     textColor,
     whiteBgColor,
     setThemeColor,
-    colorOptions, // Adding color options to the context
-    userName,
-    setUserName,
-    isLoggedIn,
-    setIsLoggedIn,
-    // Add more state variables and their setters as needed
+    hideBottomTab,
+    setHideBottomTab,
+    colorOptions,
+    medium,
+    hard,
+    activeTest,
+    setActiveTest,
+    started,
+    setStarted
   };
 
   return (
